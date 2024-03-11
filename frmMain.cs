@@ -18,7 +18,7 @@ namespace DBPROJECT
         {
             InitializeComponent();
 
-
+            
         }
        
         private void btnExit_Click(object sender, EventArgs e)
@@ -91,6 +91,17 @@ namespace DBPROJECT
         {
             UserProfilefrm.Dispose();
         }
-
+        frmUser Userfrm;
+        private void usersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Userfrm = new frmUser();
+            Userfrm.FormClosed += Userfrm_FormClosed;
+            Userfrm.MdiParent = this;
+            Userfrm.Show();
+        }
+        private void Userfrm_FormClosed(object sender, EventArgs e)
+        {
+            Userfrm.Dispose();
+        }
     }
 }
