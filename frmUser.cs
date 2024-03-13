@@ -50,7 +50,7 @@ namespace DBPROJECT
 
                 this.bNavMain.BindingSource = this.DBindingSource;
             }
-            }
+        }
         private void FormatGrid()
         {
             this.dgvMain.Columns["id"].Visible = false;
@@ -72,5 +72,78 @@ namespace DBPROJECT
             this.dgvMain.ColumnHeadersDefaultCellStyle.BackColor = Globals.gGridHeaderColor;
 
         }
+
+        private void dgvMain_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
+        {
+            using (SolidBrush b = new SolidBrush(((DataGridView)sender).RowHeadersDefaultCellStyle.ForeColor))
+
+            {
+
+                e.Graphics.DrawString(
+
+                    String.Format("{0,10}", (e.RowIndex + 1).ToString()),
+
+                    e.InheritedRowStyle.Font, b, e.RowBounds.Location.X + 10, e.RowBounds.Location.Y + 4);
+
+            }
+        }
+
+        private void dgvMain_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+        {
+            int firstDisplayedCellIndex = dgvMain.FirstDisplayedCell.RowIndex;
+
+            int lastDisplayedCellIndex = firstDisplayedCellIndex + dgvMain.DisplayedRowCount(true);
+
+
+
+            Graphics Graphics = dgvMain.CreateGraphics();
+
+            int measureFirstDisplayed = (int)(Graphics.MeasureString(firstDisplayedCellIndex.ToString(), dgvMain.Font).Width);
+
+            int measureLastDisplayed = (int)(Graphics.MeasureString(lastDisplayedCellIndex.ToString(), dgvMain.Font).Width);
+
+
+
+            int rowHeaderWitdh = System.Math.Max(measureFirstDisplayed, measureLastDisplayed);
+
+            dgvMain.RowHeadersWidth = rowHeaderWitdh + 40;
+        }
+
+        private void dgvMain_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            bool cancel = true;
+
+            DataGridViewRow rw = this.dgvMain.CurrentRow;
+            String n = rw.Cells["loginname"].Value.ToString().Trim();
+
+            if (rw.Cells[idcolumn].Value != DBNull.Value &&
+               csMessageBox.Show("Delete the user:" + n, "Please confirm.",
+                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                if (Globals.glOpenSqlConn())
+                {
+
+                    SqlCommand cmd = new SqlCommand("dbo.spusersDelete", Globals.sqlconn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@rid", Convert.ToInt64(rw.Cells[idcolumn].Value));
+                    cmd.ExecuteNonQuery();
+
+                    e.Cancel = false;
+
+                }
+                Globals.glCloseSqlConn();
+                e.Cancel = false;
+
+                }
+                else e.Cancel = true;
+
+            }
+           
+        }
+
+
     }
-}
+
+
+        
+   
