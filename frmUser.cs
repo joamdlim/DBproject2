@@ -20,6 +20,8 @@ namespace DBPROJECT
         SqlCommand Dcommand;
         BindingSource DBindingSource;
 
+        Boolean CancelUpdates;
+
         int idcolumn = 0;
         public frmUser()
         {
@@ -33,6 +35,7 @@ namespace DBPROJECT
         }
         private void BindMainGrid()
         {
+            this.CancelUpdates = true;
             if (Globals.glOpenSqlConn())
             {
                 this.Dcommand = new SqlCommand("spGetAllUsers", Globals.sqlconn);
@@ -53,7 +56,8 @@ namespace DBPROJECT
         }
         private void FormatGrid()
         {
-            this.dgvMain.Columns["id"].Visible = false;
+            
+            this.dgvMain.Columns["id"].Visible = true;
 
             this.dgvMain.Columns["loginname"].HeaderText = "Login Name";
             this.dgvMain.Columns["active"].HeaderText = "Active";
@@ -138,11 +142,159 @@ namespace DBPROJECT
                 else e.Cancel = true;
 
             }
-           
+
+        private void dgvMain_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+
+            long userid = 0;
+
+            if (this.CancelUpdates == false && this.dgvMain.CurrentRow != null)
+
+            {
+
+                if (Globals.glOpenSqlConn())
+
+                {
+
+                    DataGridViewRow row = dgvMain.CurrentRow;
+
+                    String uloginname = row.Cells["loginname"].Value == DBNull.Value ? ""
+
+                        : row.Cells["loginname"].Value.ToString().ToUpper();
+
+                    int uactive = row.Cells["active"].Value == DBNull.Value
+
+                         ? 0 : Convert.ToInt32(row.Cells["active"].Value);
+
+                    int umustchangepwd = row.Cells["mustchangepwd"].Value == DBNull.Value
+
+                        ? 0 : Convert.ToInt32(row.Cells["mustchangepwd"].Value);
+
+                    String uemail = row.Cells["email"].Value == DBNull.Value ? ""
+
+                        : row.Cells["email"].Value.ToString();
+
+                    String usmtphost = row.Cells["smtphost"].Value == DBNull.Value ? ""
+
+                        : row.Cells["smtphost"].Value.ToString();
+
+                    String usmtpport = row.Cells["smtpport"].Value == DBNull.Value ? ""
+
+                        : row.Cells["smtpport"].Value.ToString();
+
+                    String ugender = row.Cells["gender"].Value == DBNull.Value ? ""
+
+                        : row.Cells["gender"].Value.ToString();
+
+                    // DateTime dt1 = row.Cells["birthdate"].Value == DBNull.Value ? ""
+
+                    // : row.Cells["birthdate"].Value;
+
+
+
+                    // String ubirthdate = row.Cells["birthdate"].Value == DBNull.Value ? ""
+
+                    //  : row.Cells["birthdate"].Value.ToString();
+
+                    if (row.Cells["loginname"].Value == DBNull.Value)
+
+                    {
+
+                        csMessageBox.Show("Please encode a valid user name", "Warning",
+
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                        dgvMain.CancelEdit();
+
+                    }
+
+                    else
+
+                    {
+
+                        try
+
+                        {
+
+                            SqlCommand cmd = new SqlCommand("spusersAddEdit", Globals.sqlconn);
+
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            if (row.Cells[this.idcolumn].Value == DBNull.Value)
+
+                                userid = 0;
+
+                            else
+
+                                userid = Convert.ToInt64(row.Cells[this.idcolumn].Value);
+
+                            cmd.Parameters.AddWithValue("@uid", userid);
+
+                            cmd.Parameters.AddWithValue("@uloginname", uloginname);
+
+                            cmd.Parameters.AddWithValue("@uactive", uactive);
+
+                            cmd.Parameters.AddWithValue("@umustchangepwd", umustchangepwd);
+
+                            cmd.Parameters.AddWithValue("@uemail", uemail);
+
+                            cmd.Parameters.AddWithValue("@usmtphost", usmtphost);
+
+                            cmd.Parameters.AddWithValue("@usmtpport", usmtpport);
+
+                            cmd.Parameters.AddWithValue("@ugender", ugender);
+
+                            //  cmd.Parameters.AddWithValue("@ubirthdate", ubirthdate);
+
+
+
+                            SqlDataAdapter dAdapt = new SqlDataAdapter(cmd);
+
+                            DataTable dt = new DataTable();
+
+                            dAdapt.Fill(dt);
+
+
+
+                        }
+
+                        catch (Exception ex)
+
+                        {
+
+
+
+                            csMessageBox.Show("Exception Error:" + ex.Message,
+
+                                "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                        }
+
+                    }
+
+                    Globals.glCloseSqlConn();
+
+
+
+
+
+                }
+
+                Globals.glCloseSqlConn();
+
+            }
+
+
+
+
+
         }
 
-
     }
+    }
+
+
+    
 
 
         
