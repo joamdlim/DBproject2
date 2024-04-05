@@ -50,11 +50,54 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmAskDate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAskDate.designer.cs">
+      <DependentUpon>frmAskDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAskDialog.cs" />
+    <Compile Include="frmAskFloat.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAskFloat.designer.cs">
+      <DependentUpon>frmAskFloat.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAskInt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAskInt.designer.cs">
+      <DependentUpon>frmAskInt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAskString.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAskString.designer.cs">
+      <DependentUpon>frmAskString.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAskStringPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAskStringPassword.designer.cs">
+      <DependentUpon>frmAskStringPassword.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmEditUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEditUser.Designer.cs">
+      <DependentUpon>frmEditUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmUser.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmUser.Designer.cs">
       <DependentUpon>frmUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmUserEmail.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmUserEmail.Designer.cs">
+      <DependentUpon>frmUserEmail.cs</DependentUpon>
     </Compile>
     <Compile Include="frmUserProfile.cs">
       <SubType>Form</SubType>
@@ -114,8 +157,27 @@
     <Compile Include="Globals.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="frmAskDate.resx" />
+    <EmbeddedResource Include="frmAskFloat.resx">
+      <DependentUpon>frmAskFloat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAskInt.resx">
+      <DependentUpon>frmAskInt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAskString.resx">
+      <DependentUpon>frmAskString.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAskStringPassword.resx">
+      <DependentUpon>frmAskStringPassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEditUser.resx">
+      <DependentUpon>frmEditUser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmUser.resx">
       <DependentUpon>frmUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmUserEmail.resx">
+      <DependentUpon>frmUserEmail.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmUserProfile.resx">
       <DependentUpon>frmUserProfile.cs</DependentUpon>

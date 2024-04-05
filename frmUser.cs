@@ -30,8 +30,10 @@ namespace DBPROJECT
 
         private void frmUser_Load(object sender, EventArgs e)
         {
+            this.CancelUpdates = true;
             this.BindMainGrid();
             this.FormatGrid();
+            this.CancelUpdates = false;
         }
         private void BindMainGrid()
         {
@@ -53,11 +55,12 @@ namespace DBPROJECT
 
                 this.bNavMain.BindingSource = this.DBindingSource;
             }
+            this.CancelUpdates = false;
         }
         private void FormatGrid()
         {
             
-            this.dgvMain.Columns["id"].Visible = true;
+            this.dgvMain.Columns["id"].Visible = false;
 
             this.dgvMain.Columns["loginname"].HeaderText = "Login Name";
             this.dgvMain.Columns["active"].HeaderText = "Active";
@@ -67,7 +70,7 @@ namespace DBPROJECT
             this.dgvMain.Columns["smtpport"].HeaderText = "SMTP Port";
             this.dgvMain.Columns["gender"].HeaderText = "Gender";
             this.dgvMain.Columns["birthdate"].HeaderText = "BirthDay";
-
+            this.dgvMain.Columns["birthdate"].Visible = false;
 
             this.dgvMain.BackgroundColor = Globals.gGridOddRowColor;
             this.dgvMain.AlternatingRowsDefaultCellStyle.BackColor = Globals.gGridEvenRowColor;
@@ -147,6 +150,7 @@ namespace DBPROJECT
         {
 
             long userid = 0;
+            long newuserid;
 
             if (this.CancelUpdates == false && this.dgvMain.CurrentRow != null)
 
@@ -186,15 +190,18 @@ namespace DBPROJECT
 
                         : row.Cells["gender"].Value.ToString();
 
-                    // DateTime dt1 = row.Cells["birthdate"].Value == DBNull.Value ? ""
+                    DateTime dt3;
+                    if (userid == 0)
+                    {
+                        dt3 = DateTime.Now;
+                    }
+                    else
+                        dt3 = DateTime.Parse(row.Cells["birthdate"].Value.ToString());
 
-                    // : row.Cells["birthdate"].Value;
-
-
-
-                    // String ubirthdate = row.Cells["birthdate"].Value == DBNull.Value ? ""
-
-                    //  : row.Cells["birthdate"].Value.ToString();
+                    String dt4 = Globals.glToMySqlDate(dt3);
+                    
+                    //DateTime dt3 = DateTime.Parse(row.Cells["birthdate"].Value.ToString());
+                    //String dt4 = Globals.glToMySqlDate(dt3);
 
                     if (row.Cells["loginname"].Value == DBNull.Value)
 
@@ -244,7 +251,7 @@ namespace DBPROJECT
 
                             cmd.Parameters.AddWithValue("@ugender", ugender);
 
-                            //  cmd.Parameters.AddWithValue("@ubirthdate", ubirthdate);
+                            //cmd.Parameters.AddWithValue("@ubirthdate", dt4);
 
 
 
@@ -254,8 +261,10 @@ namespace DBPROJECT
 
                             dAdapt.Fill(dt);
 
+                            newuserid = long.Parse(dt.Rows[0][0].ToString());
 
-
+                            if (userid == 0)
+                                row.Cells["id"].Value = newuserid;
                         }
 
                         catch (Exception ex)
@@ -290,7 +299,98 @@ namespace DBPROJECT
 
         }
 
+        private void dgvMain_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+        private Boolean SearchName(String searchVal)
+        {
+            bool resultVal = false;
+            int rowIndex = -1;
+
+            searchVal = searchVal.Trim().ToUpper();
+            if (searchVal != "")
+            {
+                this.bNavMain.MoveFirstItem.PerformClick();
+
+                foreach (DataGridViewRow row in dgvMain.Rows)
+                {
+                    try
+                    {
+                        if (row.Cells["loginname"].Value.ToString().StartsWith(searchVal))
+                        {
+                            rowIndex = row.Index;
+                            dgvMain.Rows[row.Index].Selected = true;
+                            resultVal = true;
+                            break;
+                        }
+                        this.bNavMain.MoveNextItem.PerformClick();
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                } // foreach
+                if (!resultVal)
+                    csMessageBox.Show("Record not found.", "Search Result",
+                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            } // if
+            return resultVal;
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            {
+                String searchVal = txtSearch.Text.Trim().ToUpper();
+
+                if (this.SearchName(searchVal))
+                {
+                    this.txtSearch.Clear();
+                    this.dgvMain.Focus();
+
+                }
+                else
+                {
+                    this.txtSearch.Focus();
+                }
+            }
+        }
+            private frmEditUser EditUserfrm;
+
+        private void dgvMain_DoubleClick(object sender, EventArgs e)
+        {
+            long userid;
+
+            DataGridViewRow row = dgvMain.CurrentRow;
+
+
+
+            if (row.Cells[this.idcolumn].Value == DBNull.Value)
+
+                userid = 0;
+
+            else
+
+                userid = Convert.ToInt64(row.Cells[this.idcolumn].Value);
+
+
+
+            if (userid != 0)
+
+            {
+
+                EditUserfrm = new frmEditUser(userid);
+
+                EditUserfrm.MdiParent = this.MdiParent;
+
+                EditUserfrm.Show();
+
+            }
+
+        }
     }
+    
     }
 
 
