@@ -265,17 +265,10 @@ namespace DBPROJECT
 
                             {
 
-                                SqlCommand cmd = new SqlCommand("spcustomersAddEdit", Globals.sqlconn);
+                                SqlCommand cmd = new SqlCommand("spCustomersAddEdit", Globals.sqlconn);
 
                                 cmd.CommandType = CommandType.StoredProcedure;
 
-                                if (row.Cells[this.idcolumn].Value == DBNull.Value)
-
-                                    customerid = 0;
-
-                                else
-
-                                    customerid = Convert.ToInt64(row.Cells[this.idcolumn].Value);
 
                                 cmd.Parameters.AddWithValue("@cid", customerid);
 
@@ -318,22 +311,15 @@ namespace DBPROJECT
                         Globals.glCloseSqlConn();
 
 
-
-
-
                     }
 
                     Globals.glCloseSqlConn();
 
                 }
 
-
-
-
-
             
         }
-
+        private frmEditCustomers EditCustomerfrm;
         private void dgvCust_DoubleClick_1(object sender, EventArgs e)
         {
             long customerid;
@@ -356,13 +342,47 @@ namespace DBPROJECT
 
             {
 
-                EditUserfrm = new frmEditUser(customerid);
+                EditCustomerfrm = new frmEditCustomers(customerid);
 
-                EditUserfrm.MdiParent = this.MdiParent;
+                EditCustomerfrm.MdiParent = this.MdiParent;
 
-                EditUserfrm.Show();
+                EditCustomerfrm.Show();
 
             }
+        }
+
+        private void dgvCust_UserDeletingRow_1(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            bool cancel = true;
+
+            DataGridViewRow rw = this.dgvCust.CurrentRow;
+            String n = rw.Cells["nameCustomer"].Value.ToString().Trim();
+
+            if (rw.Cells[idcolumn].Value != DBNull.Value &&
+               csMessageBox.Show("Delete the user:" + n, "Please confirm.",
+                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                if (Globals.glOpenSqlConn())
+                {
+
+                    SqlCommand cmd = new SqlCommand("dbo.spCustomersDelete", Globals.sqlconn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@cid", Convert.ToInt64(rw.Cells[idcolumn].Value));
+                    cmd.ExecuteNonQuery();
+
+                    e.Cancel = false;
+
+                }
+                Globals.glCloseSqlConn();
+                e.Cancel = false;
+
+            }
+            else e.Cancel = true;
+        }
+
+        private void dgvCust_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 

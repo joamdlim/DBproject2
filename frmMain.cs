@@ -113,7 +113,7 @@ namespace DBPROJECT
         }
         private void frmcust_FormClosed(object sender, EventArgs e)
         {
-            Userfrm.Dispose();
+            frmcust.Dispose();
         }
 
         private void btnSuppliers_Click(object sender, EventArgs e)

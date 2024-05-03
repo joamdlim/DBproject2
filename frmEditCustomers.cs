@@ -2,28 +2,22 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.Sql;
-using System.Data.SqlClient;
-
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-//using MySql.Data.MySqlClient;
 
 namespace DBPROJECT
 {
-    public partial class frmEditUser : Form
+    public partial class frmEditCustomers : Form
     {
-        long idCustomer=0;
-        public frmEditUser(long tidCustomer)
+        long idUser = 0;
+        public frmEditCustomers(long tidUser)
         {
-
             InitializeComponent();
 
-            this.idCustomer = tidCustomer;
+            this.idUser = tidUser;
 
             this.pkrBirthdate.Format = DateTimePickerFormat.Custom;
             this.pkrBirthdate.CustomFormat = Globals.gdefaultDateFormat;
@@ -40,8 +34,8 @@ namespace DBPROJECT
         }
         public long userid
         {
-            get { return this.idCustomer; }
-            set { this.idCustomer = value; }
+            get { return this.idUser; }
+            set { this.idUser = value; }
         }
 
         private void txtEmail_KeyDown(object sender, KeyEventArgs e)
@@ -69,14 +63,14 @@ namespace DBPROJECT
 
         private void RefreshData()
         {
-            String tloginname = "", temail = "", tgender = "MALE",tactive="", tmustchangepwd="";
+            String tloginname = "", temail = "", tgender = "MALE", tactive = "", tmustchangepwd = "";
             String tsmtphost = "", tsmtpport = "";
             DateTime tbirthdate = Convert.ToDateTime("01/01/1900");
 
             // load photo here
             this.GetUserPhotofromField();
 
-            this.GetProfile(this.idCustomer, ref tloginname, ref tactive, ref tmustchangepwd,
+            this.GetProfile(this.idUser, ref tloginname, ref tactive, ref tmustchangepwd,
                  ref temail, ref tsmtphost, ref tsmtpport, ref tbirthdate, ref tgender);
 
             this.txtLoginName.Text = tloginname;
@@ -93,12 +87,12 @@ namespace DBPROJECT
 
             this.pkrBirthdate.Value = tbirthdate;
             this.cbxGender.SelectedItem = tgender;
-     
-            this.btnSave.Enabled = false;
-         }
 
-        private void GetProfile(long uidCustomer,
-            ref String uloginname,ref String uactive, ref String umustchangepwd,
+            this.btnSave.Enabled = false;
+        }
+
+        private void GetProfile(long uiduser,
+            ref String uloginname, ref String uactive, ref String umustchangepwd,
             ref String uemail, ref String usmtphost, ref String usmtpport,
             ref DateTime ubirthdate,
             ref String ugender)
@@ -108,7 +102,7 @@ namespace DBPROJECT
                 SqlCommand cmd = new SqlCommand("spGetUserProfile",
                     Globals.sqlconn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@lidCustomer", uidCustomer);
+                cmd.Parameters.AddWithValue("@liduser", uiduser);
 
                 SqlDataReader reader = cmd.ExecuteReader();
 
@@ -127,7 +121,7 @@ namespace DBPROJECT
                     ugender = Globals.glConvertBlankGender(reader["gender"].ToString());
 
                 }
-                else csMessageBox.Show("No such User ID:" + this.idCustomer.ToString() + " is found!", "Warning",
+                else csMessageBox.Show("No such User ID:" + this.idUser.ToString() + " is found!", "Warning",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             Globals.glCloseSqlConn();
@@ -135,10 +129,10 @@ namespace DBPROJECT
 
         void GetUserPhotofromField()
         {
-        
+
             if (Globals.glOpenSqlConn())
             {
-                String qrystr = "Select isnull(photo,'') as photo from dbo.users where id=" +this.idCustomer.ToString();
+                String qrystr = "Select isnull(photo,'') as photo from dbo.users where id=" + this.idUser.ToString();
                 SqlCommand cmd = new SqlCommand(qrystr, Globals.sqlconn);
 
                 SqlDataAdapter UserAdapter = new SqlDataAdapter(cmd);
@@ -160,7 +154,7 @@ namespace DBPROJECT
             }
             Globals.glCloseSqlConn();
         }
-        
+
         private void UpdateUser()
         {
             int lactive = 0, lmustchangepwd = 0;
@@ -170,7 +164,7 @@ namespace DBPROJECT
                 SqlCommand cmd = new SqlCommand("spUpdateUser2", Globals.sqlconn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@lidCustomer", this.idCustomer);
+                cmd.Parameters.AddWithValue("@lidUser", this.idUser);
                 cmd.Parameters.AddWithValue("@lloginName", this.txtLoginName.Text);
 
                 if (this.chkActive.Checked) lactive = 1;
@@ -218,11 +212,11 @@ namespace DBPROJECT
             if (Globals.glOpenSqlConn())
             {
                 String qrystr = "update users set photo=@img where id =" +
-                    this.idCustomer.ToString();
+                    this.idUser.ToString();
 
                 SqlCommand cmd = new SqlCommand(qrystr, Globals.sqlconn);
 
-                cmd.Parameters.Add("@img",SqlDbType.Image); //MySqlDbType.Blob
+                cmd.Parameters.Add("@img", SqlDbType.Image); //MySqlDbType.Blob
                 cmd.Parameters["@img"].Value = img;
 
                 if (cmd.ExecuteNonQuery() == 1)
@@ -239,7 +233,7 @@ namespace DBPROJECT
             if (Globals.glOpenSqlConn())
             {
                 String qrystr = "update users set photo=null where id =" +
-                    Globals.gidCustomer.ToString();
+                    Globals.gIdUser.ToString();
 
                 SqlCommand cmd = new SqlCommand(qrystr, Globals.sqlconn);
 
@@ -286,7 +280,7 @@ namespace DBPROJECT
                         else
                         {
                             this.UpdateUser();
-                            
+
                         }
                         break;
                     case DialogResult.Cancel:
@@ -329,7 +323,7 @@ namespace DBPROJECT
 
         private void Load_AssignedUserRoles()
         {
-            
+
             if (Globals.glOpenSqlConn())
             {
                 SqlCommand cmd = new SqlCommand();
@@ -344,7 +338,7 @@ namespace DBPROJECT
 
                 DCommandBuilder.DataAdapter = DAdapter;
 
-                cmd.Parameters.AddWithValue("lid", this.idCustomer);
+                cmd.Parameters.AddWithValue("lid", this.idUser);
 
                 DAdapter.SelectCommand = cmd;
                 DAdapter.Fill(DTable);
@@ -356,7 +350,7 @@ namespace DBPROJECT
                 bindingNavigator1.BindingSource = DBindingSource;
 
                 this.dataGridView1.DataSource = DBindingSource;
-                
+
             }
 
             Globals.glCloseSqlConn();
@@ -378,7 +372,7 @@ namespace DBPROJECT
 
                 DCommandBuilder.DataAdapter = DAdapter;
 
-                cmd.Parameters.AddWithValue("@ridCustomer", this.idCustomer);
+                cmd.Parameters.AddWithValue("@riduser", this.idUser);
 
                 DAdapter.SelectCommand = cmd;
                 DAdapter.Fill(DTable);
@@ -405,9 +399,9 @@ namespace DBPROJECT
                 SqlCommand cmd = new SqlCommand("spAssignUserRole", Globals.sqlconn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@uidrole", Convert.ToInt64(row.Cells[1].Value));
-                cmd.Parameters.AddWithValue("@uidCustomer", Convert.ToInt64(this.idCustomer));
+                cmd.Parameters.AddWithValue("@uiduser", Convert.ToInt64(this.idUser));
                 cmd.ExecuteNonQuery();
-          
+
                 Globals.glCloseSqlConn();
 
                 this.Load_AssignedUserRoles();
@@ -425,16 +419,16 @@ namespace DBPROJECT
                 SqlCommand cmd = new SqlCommand("spUnAssignUserRole", Globals.sqlconn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@uidCustomer", Convert.ToInt64(this.idCustomer));
+                cmd.Parameters.AddWithValue("@uiduser", Convert.ToInt64(this.idUser));
                 cmd.Parameters.AddWithValue("@uidrole", Convert.ToInt64(row.Cells[1].Value));
-                                cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
 
                 Globals.glCloseSqlConn();
 
                 this.Load_AssignedUserRoles();
                 this.Load_AvailableRoles();
             }
-            
+
         }
 
         private void btnRemoveAll_Click(object sender, EventArgs e)
@@ -447,7 +441,7 @@ namespace DBPROJECT
                 SqlCommand cmd = new SqlCommand("spUnassignAllUserRoles", Globals.sqlconn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@uidCustomer", Convert.ToInt64(this.idCustomer));
+                cmd.Parameters.AddWithValue("@uiduser", Convert.ToInt64(this.idUser));
                 cmd.ExecuteNonQuery();
 
                 Globals.glCloseSqlConn();
@@ -467,7 +461,7 @@ namespace DBPROJECT
                 SqlCommand cmd = new SqlCommand("spAssignAllUserRoles", Globals.sqlconn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@uidCustomer", Convert.ToInt64(this.idCustomer));
+                cmd.Parameters.AddWithValue("@uiduser", Convert.ToInt64(this.idUser));
                 cmd.ExecuteNonQuery();
 
                 Globals.glCloseSqlConn();
@@ -481,7 +475,7 @@ namespace DBPROJECT
         private frmChangePassword ChangePasswordfrm;
         private void btnChangePwd_Click(object sender, EventArgs e)
         {
-            ChangePasswordfrm = new frmChangePassword(this.idCustomer, 
+            ChangePasswordfrm = new frmChangePassword(this.idUser,
                  this.txtLoginName.Text);
 
             ChangePasswordfrm.FormClosed += ChangePasswordfrm_FormClosed;
@@ -498,7 +492,7 @@ namespace DBPROJECT
         private frmUserEmail UserEmailfrm;
         private void btnSendEmail_Click(object sender, EventArgs e)
         {
-            UserEmailfrm = new frmUserEmail(this.txtLoginName.Text,this.txtEmail.Text);
+            UserEmailfrm = new frmUserEmail(this.txtLoginName.Text, this.txtEmail.Text);
 
             UserEmailfrm.MdiParent = this.MdiParent;
 
